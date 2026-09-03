@@ -52,10 +52,10 @@ export default function Donantes() {
       </div>
 
       {conPendientes.length > 0 && (
-        <div className="avisoError">
-          {conPendientes.reduce((n, d) => n + d.pendientes, 0)} entradas están pendientes de completar
-          (fecha o número de recibo). Se pueden corregir desde el panel de gestión.
-        </div>
+        <p className={styles.nota}>
+          {conPendientes.reduce((n, d) => n + d.pendientes, 0)} de las entradas registradas
+          no tienen fecha ni número de recibo en el archivo original.
+        </p>
       )}
 
       <Panel titulo="Unidades donadas por aportante" subtitulo="Personas y entidades que han donado">

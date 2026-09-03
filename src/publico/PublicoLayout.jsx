@@ -45,14 +45,11 @@ export default function PublicoLayout() {
                 {e.txt}
               </NavLink>
             ))}
-            <NavLink to="/panel" className={styles.enlacePanel} onClick={() => setMenuAbierto(false)}>
-              🔒 Panel
-            </NavLink>
           </nav>
         </div>
         <div className={styles.titulo}>
           <div className="contenedor">
-            <h1>Gestión de Donaciones</h1>
+            <h1>Panorama de Donaciones</h1>
             <p>{estado.datos?.config?.titulo || 'Comité de Cafeteros de Caldas'}</p>
           </div>
         </div>

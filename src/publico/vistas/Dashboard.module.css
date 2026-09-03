@@ -18,7 +18,7 @@
 }
 .bandaOk { background: var(--ok-fondo); color: var(--ok); }
 .bandaMal { background: var(--agotado-fondo); color: var(--agotado); }
-.bandaEnlace { color: inherit; text-decoration: underline; font-weight: 700; }
+.bandaNota { color: inherit; opacity: 0.85; font-weight: 600; }
 
 .rejilla {
   display: grid;

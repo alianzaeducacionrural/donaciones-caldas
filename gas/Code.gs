@@ -62,7 +62,11 @@ function doPost(e) {
     }
     return responder(r)
   } catch (err) {
-    return responder({ ok: false, error: String(err && err.message || err), codigo: 'ERROR' })
+    return responder({
+      ok: false,
+      error: String(err && err.message || err),
+      codigo: (err && err.codigo) || 'ERROR',
+    })
   } finally {
     SpreadsheetApp.flush()
     lock.releaseLock()

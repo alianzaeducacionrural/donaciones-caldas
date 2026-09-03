@@ -64,9 +64,9 @@ export default function Dashboard() {
           ? <>✓ Inventario cuadrado — recibido menos entregado coincide con el stock disponible.</>
           : <>⚠ Descuadre de {numero(Math.abs(cuadre.diferencia))} unidades entre movimientos y stock.</>}
         {r.pendientes > 0 && (
-          <Link to="/donantes" className={styles.bandaEnlace}>
-            · {r.pendientes} entradas por completar
-          </Link>
+          <span className={styles.bandaNota}>
+            · {r.pendientes} entradas sin fecha en el archivo original
+          </span>
         )}
       </div>
 

@@ -55,17 +55,6 @@
 }
 .activo:hover { background: var(--vino-oscuro); color: #fff; }
 
-.enlacePanel {
-  margin-left: 0.5rem;
-  padding: 0.5rem 0.85rem;
-  border: 1.5px solid var(--borde-fuerte);
-  border-radius: var(--radio-pill);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--texto);
-}
-.enlacePanel:hover { background: var(--superficie-2); text-decoration: none; }
-
 .titulo {
   background: linear-gradient(100deg, var(--vino) 0%, var(--vino-oscuro) 100%);
   color: #fff;
