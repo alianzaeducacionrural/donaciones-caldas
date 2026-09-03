@@ -13,7 +13,7 @@ export default function Auditoria() {
     const f = registros.map((r, i) => ({ ...r, _id: i }))
     if (!texto) return f
     const q = texto.toLowerCase()
-    return f.filter((r) => `${r.operador} ${r.accion} ${r.entidad} ${r.entidad_id} ${r.detalle}`.toLowerCase().includes(q))
+    return f.filter((r) => `${r.accion} ${r.entidad} ${r.entidad_id} ${r.detalle}`.toLowerCase().includes(q))
   }, [registros, texto])
 
   const columnas = [
@@ -24,7 +24,6 @@ export default function Auditoria() {
         return Number.isNaN(d.getTime()) ? r.timestamp : `${fechaCorta(r.timestamp)} ${d.toLocaleTimeString('es-CO')}`
       },
     },
-    { clave: 'operador', etiqueta: 'Operador', ordenable: true },
     { clave: 'accion', etiqueta: 'Acción', ordenable: true, render: (r) => <span className="pildora pildora-neutra">{r.accion}</span> },
     { clave: 'entidad', etiqueta: 'Entidad' },
     { clave: 'entidad_id', etiqueta: 'ID' },
