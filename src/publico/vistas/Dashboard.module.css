@@ -6,20 +6,6 @@
   gap: 1rem;
 }
 
-.banda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.7rem 1rem;
-  border-radius: var(--radio);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-.bandaOk { background: var(--ok-fondo); color: var(--ok); }
-.bandaMal { background: var(--agotado-fondo); color: var(--agotado); }
-.bandaNota { color: inherit; opacity: 0.85; font-weight: 600; }
-
 .rejilla {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

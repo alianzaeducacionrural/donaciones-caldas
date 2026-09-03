@@ -6,7 +6,7 @@ import isologo from '../assets/isologo.png'
 import styles from './PublicoLayout.module.css'
 
 const ENLACES = [
-  { a: '/', txt: 'Panorama', fin: true },
+  { a: '/', txt: 'Resumen', fin: true },
   { a: '/disponibilidad', txt: 'Disponibilidad' },
   { a: '/municipios', txt: 'Municipios' },
   { a: '/donantes', txt: 'Donantes' },
@@ -49,7 +49,7 @@ export default function PublicoLayout() {
         </div>
         <div className={styles.titulo}>
           <div className="contenedor">
-            <h1>Panorama de Donaciones</h1>
+            <h1>Donaciones</h1>
             <p>{estado.datos?.config?.titulo || 'Comité de Cafeteros de Caldas'}</p>
           </div>
         </div>

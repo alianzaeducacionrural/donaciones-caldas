@@ -16,13 +16,18 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  min-height: 64px;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  min-height: 84px;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
 }
 
-.marca { flex-shrink: 0; }
-.logo { height: 40px; width: auto; }
+.marca { flex-shrink: 0; display: flex; align-items: center; }
+.logo { height: 60px; width: auto; }
+
+@media (max-width: 860px) {
+  .logo { height: 48px; }
+  .barra { min-height: 68px; }
+}
 
 .hamburguesa {
   display: none;

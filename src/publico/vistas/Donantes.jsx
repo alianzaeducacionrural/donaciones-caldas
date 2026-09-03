@@ -16,7 +16,6 @@ export default function Donantes() {
 
   const donantes = useMemo(() => porDonante(entradas, articulos), [entradas, articulos])
   const totalUnidades = donantes.reduce((n, d) => n + d.unidades, 0)
-  const conPendientes = donantes.filter((d) => d.pendientes > 0)
 
   const grafica = donantes.slice(0, 12)
 
@@ -50,13 +49,6 @@ export default function Donantes() {
           <span>mayor aportante</span>
         </div>
       </div>
-
-      {conPendientes.length > 0 && (
-        <p className={styles.nota}>
-          {conPendientes.reduce((n, d) => n + d.pendientes, 0)} de las entradas registradas
-          no tienen fecha ni número de recibo en el archivo original.
-        </p>
-      )}
 
       <Panel titulo="Unidades donadas por aportante" subtitulo="Personas y entidades que han donado">
         <ResponsiveContainer width="100%" height={Math.max(220, grafica.length * 38)}>

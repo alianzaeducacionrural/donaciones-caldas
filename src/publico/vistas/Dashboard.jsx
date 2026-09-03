@@ -8,7 +8,7 @@ import TarjetaKpi from '../../components/TarjetaKpi'
 import Panel from '../../components/Panel'
 import { EJE, REJILLA, TooltipDonaciones } from '../../components/graficas'
 import {
-  resumen, porCategoria, serieDiaria, topDisponibles, inventarioCuadra,
+  resumen, porCategoria, serieDiaria, topDisponibles,
 } from '../../utils/agregados'
 import { PALETA_HEX, HEX_RESPALDO } from '../../utils/categorias'
 import { numero, fechaCorta } from '../../utils/formatear'
@@ -16,13 +16,12 @@ import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
   const { datos } = useOutletContext()
-  const { articulos, entradas, salidas, terceros, config } = datos
+  const { articulos, entradas, salidas, terceros } = datos
 
   const r = useMemo(() => resumen(articulos, entradas, salidas, terceros), [articulos, entradas, salidas, terceros])
   const cats = useMemo(() => porCategoria(articulos, entradas, salidas), [articulos, entradas, salidas])
   const serie = useMemo(() => serieDiaria(entradas, salidas), [entradas, salidas])
   const top = useMemo(() => topDisponibles(articulos, entradas, salidas, 10), [articulos, entradas, salidas])
-  const cuadre = useMemo(() => inventarioCuadra(articulos, entradas, salidas), [articulos, entradas, salidas])
 
   const listaCats = cats.map((c) => c.categoria)
   const colorCat = (cat) => {
@@ -31,7 +30,6 @@ export default function Dashboard() {
   }
 
   const totalMunicipios = 27
-  const sinFecha = entradas.filter((e) => !/^\d{4}-\d{2}-\d{2}/.test(String(e.fecha || ''))).length
 
   const donut = cats
     .filter((c) => c.disponible > 0)
@@ -47,28 +45,9 @@ export default function Dashboard() {
           detalle={`en ${r.actas} ${r.actas === 1 ? 'acta' : 'actas'} de entrega`} tono="vino" indice={1} />
         <TarjetaKpi glifo="■" valor={r.disponible} etiqueta="Disponibles en bodega"
           detalle={`${r.articulos} referencias en catálogo`} tono="ok" indice={2} />
-        <TarjetaKpi glifo="%" valor={Math.round(r.tasaEntrega * 100)} sufijo=" %" etiqueta="Tasa de entrega"
-          detalle="entregado sobre recibido" tono="neutro" indice={3} />
-        <TarjetaKpi glifo="◈" valor={r.donantes} etiqueta="Donantes registrados"
-          detalle="personas y entidades" tono="amarillo" indice={4} />
         <TarjetaKpi glifo="⚑" valor={r.municipiosAtendidos} sufijo={` / ${totalMunicipios}`}
-          etiqueta="Municipios atendidos" detalle="del departamento de Caldas" tono="vino" indice={5} />
-        <TarjetaKpi glifo="!" valor={r.agotados} etiqueta="Referencias agotadas"
-          detalle={r.bajos ? `${r.bajos} más con stock bajo` : 'stock en cero'}
-          tono={r.agotados ? 'agotado' : 'ok'} indice={6} />
+          etiqueta="Municipios atendidos" detalle="del departamento de Caldas" tono="vino" indice={3} />
       </section>
-
-      {/* ── Banda de estado ── */}
-      <div className={`${styles.banda} ${cuadre.cuadra ? styles.bandaOk : styles.bandaMal}`}>
-        {cuadre.cuadra
-          ? <>✓ Inventario cuadrado — recibido menos entregado coincide con el stock disponible.</>
-          : <>⚠ Descuadre de {numero(Math.abs(cuadre.diferencia))} unidades entre movimientos y stock.</>}
-        {r.pendientes > 0 && (
-          <span className={styles.bandaNota}>
-            · {r.pendientes} entradas sin fecha en el archivo original
-          </span>
-        )}
-      </div>
 
       {/* ── Gráficas ── */}
       <div className={styles.rejilla}>
@@ -122,8 +101,7 @@ export default function Dashboard() {
         </Panel>
 
         <Panel titulo="Flujo de la campaña" subtitulo="Stock acumulado, entradas y salidas por fecha"
-          ancho="ancho"
-          pie={sinFecha > 0 ? `Nota: ${sinFecha} de ${entradas.length} entradas no tienen fecha registrada y quedan fuera de esta serie.` : null}>
+          ancho="ancho">
           {serie.length ? (
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={serie} margin={{ left: 4, right: 16 }}>
