@@ -20,9 +20,9 @@ export default function PublicoLayout() {
     <div className={styles.pagina}>
       <header className={styles.encabezado}>
         <div className={`contenedor ${styles.barra}`}>
-          <a href="https://www.federaciondecafeteros.org" className={styles.marca}>
+          <div className={styles.marca}>
             <img src={isologo} alt="Comité de Cafeteros de Caldas" className={styles.logo} />
-          </a>
+          </div>
 
           <button
             className={styles.hamburguesa}

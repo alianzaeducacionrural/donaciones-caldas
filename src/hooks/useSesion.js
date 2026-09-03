@@ -3,8 +3,8 @@ import { verificarClave } from '../utils/api'
 
 const LLAVE = 'donaciones.sesion'
 
-// Sesión ligera del panel: clave + operador guardados en sessionStorage
-// (mueren al cerrar la pestaña; importa en un equipo compartido).
+// Sesión ligera del panel: solo la clave, guardada en sessionStorage
+// (muere al cerrar la pestaña; importa en un equipo compartido).
 export function useSesion() {
   const [sesion, setSesion] = useState(() => leer())
 
@@ -17,29 +17,15 @@ export function useSesion() {
     }
   }, [sesion])
 
-  // Devuelve { ok, operadores, requiereOperador }. Solo crea la sesión cuando
-  // hay un operador resuelto (o cuando la lista trae 0-1 opciones).
-  const ingresar = useCallback(async (clave, operador = null) => {
+  const ingresar = useCallback(async (clave) => {
     const r = await verificarClave(clave)
-    const ops = r.operadores || []
-    if (operador) {
-      setSesion({ clave, operador })
-      return { ok: true, operadores: ops }
-    }
-    if (ops.length <= 1) {
-      setSesion({ clave, operador: ops[0] || '' })
-      return { ok: true, operadores: ops }
-    }
-    return { ok: true, operadores: ops, requiereOperador: true }
-  }, [])
-
-  const cambiarOperador = useCallback((operador) => {
-    setSesion((s) => (s ? { ...s, operador } : s))
+    setSesion({ clave })
+    return r
   }, [])
 
   const salir = useCallback(() => setSesion(null), [])
 
-  return { sesion, activa: !!sesion, ingresar, cambiarOperador, salir }
+  return { sesion, activa: !!sesion, ingresar, salir }
 }
 
 function leer() {

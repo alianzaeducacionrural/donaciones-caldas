@@ -38,7 +38,7 @@ function doPost(e) {
 
   const accion = cuerpo.accion || ''
   const clave = cuerpo.clave || ''
-  const operador = cuerpo.operador || 'desconocido'
+  const operador = cuerpo.operador || 'panel'
   const datos = cuerpo.datos || {}
 
   if (accion === 'verificarClave') return responder(verificarClave(clave))

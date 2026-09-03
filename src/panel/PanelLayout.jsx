@@ -19,7 +19,7 @@ const ENLACES = [
 ]
 
 export default function PanelLayout() {
-  const { sesion, activa, ingresar, cambiarOperador, salir } = useSesion()
+  const { sesion, activa, ingresar, salir } = useSesion()
   const estado = useDatos(activa ? sesion : null)
   const [menu, setMenu] = useState(false)
   const location = useLocation()
@@ -57,17 +57,6 @@ export default function PanelLayout() {
           ))}
         </nav>
         <div className={styles.pie}>
-          <label className={styles.opLabel}>Operador</label>
-          <select
-            className={styles.opSelect}
-            value={sesion.operador || ''}
-            onChange={(e) => cambiarOperador(e.target.value)}
-          >
-            <option value={sesion.operador || ''}>{sesion.operador || 'Sin nombre'}</option>
-            {(d?.config?.operadores || []).filter((o) => o !== sesion.operador).map((o) => (
-              <option key={o} value={o}>{o}</option>
-            ))}
-          </select>
           <button className={styles.salir} onClick={salir}>Cerrar sesión</button>
           <Link to="/" className={styles.publico}>Ver panorama público ↗</Link>
         </div>
