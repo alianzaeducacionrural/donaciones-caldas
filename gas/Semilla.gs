@@ -30,7 +30,7 @@ function sembrarConfig() {
     ['operadores', 'Operador 1, Operador 2', 'Nombres que aparecen al ingresar al panel'],
     ['categorias', 'HOGAR, ROPA, ALIMENTOS', 'Lista maestra de categorías de artículos'],
     ['unidades', 'UNIDAD, PACA, PAQUETE, ROLLO, BOTELLÓN', 'Unidades de medida'],
-    ['titulo_campana', 'Donaciones · Comité de Cafeteros de Caldas', 'Subtítulo del panorama público'],
+    ['titulo_campana', 'Comité de Cafeteros de Caldas', 'Subtítulo bajo el título del panorama público'],
     ['fecha_inicio_campana', '2026-09-01', 'Primera fecha de la campaña'],
     ['dominio', 'https://alianzaeducacionrural.github.io/donaciones-caldas', 'URL pública del sitio'],
   ]
