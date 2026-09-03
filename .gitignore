@@ -5,3 +5,8 @@ dist/
 
 # clasp — credenciales locales (NO el scriptId: gas/.clasp.json sí se versiona)
 .clasprc.json
+
+# El archivo original contiene datos de contacto de un beneficiario:
+# se conserva localmente como respaldo, pero no se versiona.
+docs/*.xlsx
+scripts/.cache/

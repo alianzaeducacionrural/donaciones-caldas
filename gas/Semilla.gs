@@ -82,11 +82,14 @@ const SEMILLA_ARTICULOS = [
   ['ART-028', 'GAFAS DE SEGURIDAD', 'ALIMENTOS', 'UNIDAD'],
 ]
 
+// Nota: los datos de contacto del beneficiario (documento, teléfono, dirección)
+// NO se incluyen aquí — este archivo va en un repositorio público. Se cargan
+// desde el panel (/panel/terceros), quedando solo en el Sheet.
 const SEMILLA_TERCEROS = [
   ['TER-001', 'DONANTE', 'MARCELA BOTERO/MIGUEL TRUJILLO', '', '', '', '', '', ''],
   ['TER-002', 'DONANTE', 'CAROLINA BERNAL', '', '', '', '', '', ''],
   ['TER-003', 'DONANTE', 'MANUELA MEJÍA/SERGIO FRANCO', '', '', '', '', '', ''],
-  ['TER-004', 'BENEFICIARIO', 'GERARDO ANTONIO ALZATE', '9990638', '3103477714', '', 'VEREDA LOS CUERVOS / FINCA ALTO BONITO', '', ''],
+  ['TER-004', 'BENEFICIARIO', 'GERARDO ANTONIO ALZATE', '', '', '', '', '', 'Completar datos de contacto desde el panel'],
 ]
 
 // [fecha, recibo, articulo_id, donante_id, cantidad]  ('' = dato faltante en el original)
