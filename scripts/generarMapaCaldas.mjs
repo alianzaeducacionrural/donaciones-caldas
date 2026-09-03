@@ -28,8 +28,7 @@ const ALTO = 560
 
 // Espejos candidatos (TopoJSON nacional a nivel municipio).
 const FUENTES = [
-  'https://raw.githubusercontent.com/caticoa3/colombia_mapa/master/co_2018_MGN_MPIO_POLITICO.json',
-  'https://raw.githubusercontent.com/finiterank/mapa-colombia-js/master/colombia-municipios.json',
+  'https://raw.githubusercontent.com/caticoa3/colombia_mapa/master/co_2018_MGN_MPIO_POLITICO.geojson',
 ]
 
 const CODIGO_CALDAS = '17'
@@ -85,10 +84,20 @@ function propDepto(props) {
   return ''
 }
 function propCodMun(props) {
-  for (const k of ['MPIO_CCDGO', 'MPIOS', 'DPTOMPIO', 'id']) {
+  for (const k of ['MPIO_CCNCT', 'DPTOMPIO', 'id']) {
     if (props[k] != null) return String(props[k])
   }
+  const dep = propDepto(props)
+  for (const k of ['MPIO_CCDGO', 'MPIOS']) {
+    if (props[k] != null) return dep + String(props[k]).padStart(3, '0')
+  }
   return ''
+}
+
+// Reduce la precisión de los números del path a 1 decimal (menos peso, sin
+// pérdida visible a esta escala).
+function aligerar(d) {
+  return d.replace(/-?\d+\.\d+/g, (n) => (+n).toFixed(1))
 }
 
 async function main() {
@@ -138,7 +147,7 @@ async function main() {
 
   const MUNICIPIOS_SVG = reconciliadas
     .map((r) => {
-      const d = camino(r.feature)
+      const d = aligerar(camino(r.feature))
       const [cx, cy] = camino.centroid(r.feature)
       return {
         nombre: r.nombre,
