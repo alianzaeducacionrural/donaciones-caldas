@@ -1,0 +1,36 @@
+.pagina { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.mini {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-left: 5px solid var(--vino);
+  border-radius: var(--radio);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--sombra);
+}
+.mini strong {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--vino);
+  line-height: 1.1;
+}
+.mini span { font-size: 0.78rem; color: var(--texto-suave); }
+
+.rejilla {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.aviso { color: var(--texto-suave); font-size: 0.85rem; padding: 2rem 0; text-align: center; }
+
+@media (max-width: 900px) {
+  .rejilla { grid-template-columns: 1fr; }
+}

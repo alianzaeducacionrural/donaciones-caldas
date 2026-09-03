@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.DS_Store
+
+# clasp — credenciales locales (NO el scriptId: gas/.clasp.json sí se versiona)
+.clasprc.json

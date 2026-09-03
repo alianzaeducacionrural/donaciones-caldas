@@ -1,0 +1,43 @@
+.pantalla {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, var(--vino-claro), transparent),
+    var(--fondo);
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 380px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra-lg);
+  padding: 2rem 1.75rem;
+  text-align: center;
+}
+
+.logo { height: 46px; width: auto; margin: 0 auto 1rem; }
+.titulo { font-size: 1.3rem; }
+.sub { font-size: 0.8rem; color: var(--texto-suave); margin: 0.2rem 0 1.5rem; }
+
+.tarjeta form { text-align: left; }
+
+.volver {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+}
+
+.nota {
+  max-width: 380px;
+  font-size: 0.74rem;
+  color: var(--texto-tenue);
+  text-align: center;
+}

@@ -1,0 +1,10 @@
+Dashboard Bienes y Servicios
+
+- 2 personas ingresan datos
+- Sistema integral
+
+Dashboard
+Disponibilidad
+Donación por municipio
+Categorias
+Cantidad de personas o entidades que han donado

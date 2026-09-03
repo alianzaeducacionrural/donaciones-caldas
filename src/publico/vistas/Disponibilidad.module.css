@@ -1,0 +1,16 @@
+.filtros {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.glifo {
+  display: inline-block;
+  width: 1.4em;
+  color: var(--amarillo-fuerte);
+}
+
+@media (max-width: 720px) {
+  .filtros { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,63 @@
+.tarjeta {
+  position: relative;
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  padding: 1.25rem 1.25rem 1.1rem;
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion), box-shadow var(--transicion);
+}
+
+.tarjeta::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--acento, var(--amarillo));
+}
+
+.tarjeta:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+}
+
+.glifo {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.9rem;
+  font-size: 1.9rem;
+  line-height: 1;
+  opacity: 0.16;
+}
+
+.valor {
+  font-size: clamp(2rem, 5.5vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--acento-txt, var(--amarillo-fuerte));
+  line-height: 1.05;
+}
+
+.etiqueta {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--texto-suave);
+}
+
+.detalle {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--texto-tenue);
+}
+
+/* Tonos */
+.amarillo { --acento: var(--amarillo); --acento-txt: var(--amarillo-fuerte); }
+.vino     { --acento: var(--vino);     --acento-txt: var(--vino); }
+.ok       { --acento: var(--ok);       --acento-txt: var(--ok); }
+.bajo     { --acento: var(--bajo);     --acento-txt: var(--bajo); }
+.agotado  { --acento: var(--agotado);  --acento-txt: var(--agotado); }
+.neutro   { --acento: var(--borde-fuerte); --acento-txt: var(--texto); }

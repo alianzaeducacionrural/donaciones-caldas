@@ -1,0 +1,115 @@
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.encabezado {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 64px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.marca { flex-shrink: 0; }
+.logo { height: 40px; width: auto; }
+
+.hamburguesa {
+  display: none;
+  margin-left: auto;
+  font-size: 1.4rem;
+  color: var(--vino);
+  padding: 0.25rem 0.5rem;
+}
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.enlace {
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radio-pill);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  transition: background var(--transicion), color var(--transicion);
+}
+.enlace:hover { background: var(--amarillo-claro); color: var(--texto); text-decoration: none; }
+
+.activo {
+  background: var(--vino);
+  color: #fff;
+}
+.activo:hover { background: var(--vino-oscuro); color: #fff; }
+
+.enlacePanel {
+  margin-left: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--radio-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+.enlacePanel:hover { background: var(--superficie-2); text-decoration: none; }
+
+.titulo {
+  background: linear-gradient(100deg, var(--vino) 0%, var(--vino-oscuro) 100%);
+  color: #fff;
+  padding: 1.4rem 0 1.6rem;
+}
+.titulo h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); }
+.titulo p { opacity: 0.82; font-size: 0.95rem; margin-top: 0.2rem; }
+
+.contenido {
+  flex: 1;
+  padding-top: 1.75rem;
+  padding-bottom: 3rem;
+}
+
+.pie {
+  background: var(--superficie);
+  border-top: 1px solid var(--borde);
+  padding: 1.25rem 0;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+.pie .contenedor {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .hamburguesa { display: block; }
+  .nav {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borde);
+    padding: 0.75rem 1.25rem 1rem;
+    gap: 0.25rem;
+    box-shadow: var(--sombra-md);
+  }
+  .navAbierta { display: flex; }
+  .enlace, .enlacePanel { margin: 0; }
+}

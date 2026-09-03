@@ -1,0 +1,81 @@
+.envoltura { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.lienzo { position: relative; width: 100%; }
+
+.mapa {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.municipio {
+  stroke: #fff;
+  stroke-width: 1.2;
+  cursor: pointer;
+  transition: fill var(--transicion), stroke var(--transicion), transform var(--transicion);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.municipio:hover,
+.municipio:focus {
+  outline: none;
+  stroke: var(--vino);
+  stroke-width: 2;
+}
+.activo {
+  stroke: var(--vino);
+  stroke-width: 2.5;
+}
+
+.etiqueta {
+  fill: #3a2a05;
+  font-size: 13px;
+  font-weight: 800;
+  text-anchor: middle;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.nombre {
+  fill: #6b5a48;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+
+.tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 12px));
+  background: #2B1A0E;
+  color: #fff;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: var(--sombra-md);
+}
+.tooltip strong { display: block; }
+.tooltip span { opacity: 0.85; font-size: 0.74rem; }
+
+.leyenda {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: center;
+}
+.muestra { width: 26px; height: 12px; border-radius: 2px; }
+.leyendaTxt { font-size: 0.72rem; color: var(--texto-suave); margin: 0 0.4rem; }
+
+.pie {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--texto-tenue);
+}

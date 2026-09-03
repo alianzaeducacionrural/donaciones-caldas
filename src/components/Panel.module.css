@@ -1,0 +1,43 @@
+.panel {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.titulo {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--texto);
+}
+
+.subtitulo {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.accion { flex-shrink: 0; }
+
+.cuerpo { flex: 1; min-width: 0; }
+
+.pie {
+  font-size: 0.74rem;
+  color: var(--texto-tenue);
+  border-top: 1px dashed var(--borde);
+  padding-top: 0.6rem;
+}
+
+.ancho { grid-column: 1 / -1; }
