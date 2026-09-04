@@ -76,7 +76,7 @@ export function CampoSelect({ label, nombre, valor, onChange, requerido, pista, 
         value={valor ?? ''}
         onChange={(e) => onChange(nombre, e.target.value)}
       >
-        <option value="">{placeholder}</option>
+        <option value="" disabled>{placeholder}</option>
         {opciones.map((o) => {
           const val = typeof o === 'string' ? o : o.valor
           const txt = typeof o === 'string' ? o : o.texto
