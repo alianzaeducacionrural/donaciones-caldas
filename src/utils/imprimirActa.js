@@ -58,10 +58,8 @@ export async function imprimirActa(lineas, artMap) {
     const ancho = alto * 3.6
     doc.addImage(logo, 'PNG', MARGEN, y, ancho, alto)
   }
-  doc.setFont('helvetica', 'bold').setFontSize(12).setTextColor(...VINO)
-  doc.text('Comité de Cafeteros de Caldas', MARGEN + 46, y + 5)
-  doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(...SUAVE)
-  doc.text('Sistema de Gestión de Donaciones', MARGEN + 46, y + 10)
+  doc.setFont('helvetica', 'normal').setFontSize(10).setTextColor(...TEXTO)
+  doc.text('Sistema de Gestión de Donaciones', MARGEN + 48, y + 7.5)
   y += 16
   doc.setDrawColor(...VINO).setLineWidth(0.8)
   doc.line(MARGEN, y, ANCHO_PAG - MARGEN, y)
@@ -138,19 +136,6 @@ export async function imprimirActa(lineas, artMap) {
   doc.setFont('helvetica', 'bold').setFontSize(9.5)
   doc.text('TOTAL DE UNIDADES ENTREGADAS', MARGEN + 2, y + alturaFila - 2.4)
   doc.text(numero(total), MARGEN + anchoUtil - 2, y + alturaFila - 2.4, { align: 'right' })
-  y += alturaFila + 20
-
-  // ── Firmas ──
-  if (y > 297 - MARGEN - 25) { doc.addPage(); y = MARGEN + 20 }
-  const anchoFirma = (anchoUtil - 20) / 2
-  doc.setDrawColor(...TEXTO).setLineWidth(0.3)
-  doc.line(MARGEN, y, MARGEN + anchoFirma, y)
-  doc.line(MARGEN + anchoFirma + 20, y, MARGEN + anchoUtil, y)
-  doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(...TEXTO)
-  doc.text('Entregado por', MARGEN, y + 5)
-  doc.text(responsable || '', MARGEN, y + 10)
-  doc.text('Recibido por', MARGEN + anchoFirma + 20, y + 5)
-  doc.text('Nombre, documento y firma', MARGEN + anchoFirma + 20, y + 10)
 
   // ── Pie ──
   doc.setFont('helvetica', 'normal').setFontSize(7.5).setTextColor(...SUAVE)
