@@ -37,8 +37,8 @@
 
 .acc {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
 }
 .accItem {
   --acento: var(--amarillo);
@@ -47,24 +47,27 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-lg);
-  padding: 1.15rem 1.2rem 1.25rem;
+  gap: 0.3rem;
+  background:
+    linear-gradient(155deg, color-mix(in srgb, var(--acento) 12%, var(--superficie)) 0%, var(--superficie) 55%);
+  border: 1.5px solid color-mix(in srgb, var(--acento) 22%, var(--borde));
+  border-radius: 20px;
+  padding: 1.6rem 1.5rem 1.75rem;
   box-shadow: var(--sombra);
-  transition: transform var(--transicion), box-shadow var(--transicion), border-color var(--transicion);
+  transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, border-color .22s ease;
 }
-.accItem::before {
+.accItem::after {
   content: '';
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 6px;
-  background: linear-gradient(180deg, var(--acento), var(--acento-2));
+  top: -40%; right: -25%;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--acento) 20%, transparent), transparent 70%);
+  pointer-events: none;
 }
 .accItem:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--sombra-lg);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 16px 34px -10px color-mix(in srgb, var(--acento) 45%, transparent);
   border-color: var(--acento);
   text-decoration: none;
 }
@@ -72,17 +75,34 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  margin-bottom: 0.6rem;
-  border-radius: 12px;
-  font-size: 1.3rem;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 0.9rem;
+  border-radius: 16px;
+  font-size: 1.7rem;
   color: #fff;
   background: linear-gradient(135deg, var(--acento), var(--acento-2));
-  box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--acento) 55%, transparent);
+  box-shadow: 0 6px 16px -3px color-mix(in srgb, var(--acento) 60%, transparent);
+  transition: transform .22s cubic-bezier(.22,1,.36,1);
 }
-.accItem strong { display: block; font-size: 1.02rem; color: var(--texto); }
-.accItem span { font-size: 0.82rem; color: var(--texto-suave); }
+.accItem:hover .accGlifo { transform: scale(1.08) rotate(-4deg); }
+
+.accTitulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+.accItem strong { font-size: 1.18rem; font-weight: 800; color: var(--texto); letter-spacing: -.01em; }
+.accItem span { font-size: 0.88rem; color: var(--texto-suave); }
+.accFlecha {
+  font-size: 1.2rem;
+  color: var(--acento);
+  transform: translateX(-4px);
+  opacity: 0;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.accItem:hover .accFlecha { transform: translateX(0); opacity: 1; }
 
 .accAmarillo { --acento: var(--amarillo); --acento-2: var(--dorado); }
 .accVino     { --acento: var(--vino); --acento-2: var(--vino-oscuro); }

@@ -40,22 +40,22 @@ export default function PanelResumen() {
       <div className={s.acc}>
         <Link to="/panel/entradas" className={`${s.accItem} ${s.accAmarillo} entra`} style={{ animationDelay: '.05s' }}>
           <span className={s.accGlifo} aria-hidden="true">↓</span>
-          <strong>Registrar entrada</strong>
+          <span className={s.accTitulo}><strong>Registrar entrada</strong><span className={s.accFlecha} aria-hidden="true">→</span></span>
           <span>Una donación que llega a bodega</span>
         </Link>
         <Link to="/panel/salidas" className={`${s.accItem} ${s.accVino} entra`} style={{ animationDelay: '.1s' }}>
           <span className={s.accGlifo} aria-hidden="true">↑</span>
-          <strong>Registrar entrega</strong>
+          <span className={s.accTitulo}><strong>Registrar entrega</strong><span className={s.accFlecha} aria-hidden="true">→</span></span>
           <span>Un acta de salida a un municipio</span>
         </Link>
         <Link to="/panel/articulos" className={`${s.accItem} ${s.accOk} entra`} style={{ animationDelay: '.15s' }}>
           <span className={s.accGlifo} aria-hidden="true">▦</span>
-          <strong>Catálogo de artículos</strong>
+          <span className={s.accTitulo}><strong>Catálogo de artículos</strong><span className={s.accFlecha} aria-hidden="true">→</span></span>
           <span>{r.articulos} referencias · categorías</span>
         </Link>
         <Link to="/panel/terceros" className={`${s.accItem} ${s.accAzul} entra`} style={{ animationDelay: '.2s' }}>
           <span className={s.accGlifo} aria-hidden="true">◈</span>
-          <strong>Donantes y beneficiarios</strong>
+          <span className={s.accTitulo}><strong>Donantes y beneficiarios</strong><span className={s.accFlecha} aria-hidden="true">→</span></span>
           <span>{r.donantes} donantes registrados</span>
         </Link>
       </div>

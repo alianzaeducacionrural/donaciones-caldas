@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom'
 import Tabla from '../../components/Tabla'
 import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect } from '../../components/Campos'
+import SelectorArticulo from '../../components/SelectorArticulo'
 import { useGuardar } from '../../hooks/useGuardar'
 import { crearSalida, editarSalida, anularSalida, anularActa } from '../../utils/api'
 import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles } from '../../utils/agregados'
@@ -16,7 +17,7 @@ const LINEA_VACIA = () => ({ articulo_id: '', cantidad: '', municipio: '' })
 
 export default function GestionSalidas() {
   const { datos, sesion, recargar } = useOutletContext()
-  const { articulos, entradas, salidas, terceros } = datos
+  const { articulos, entradas, salidas, terceros, config } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
 
   const stock = useMemo(() => stockPorArticulo(entradas, salidas), [entradas, salidas])
@@ -150,8 +151,8 @@ export default function GestionSalidas() {
       clave: '_acc', etiqueta: '', alinear: 'right',
       render: (x) => (
         <span className={s.acciones2}>
-          <button className={s.iconbtn} title="Ver / imprimir el acta completa"
-            onClick={(ev) => { ev.stopPropagation(); verActa(x.acta) }}>🖶 Acta</button>
+          <button className={s.iconbtn} title="Descargar el acta completa en PDF"
+            onClick={(ev) => { ev.stopPropagation(); verActa(x.acta) }}>⭳ Acta PDF</button>
           <button className={s.iconbtn} onClick={(ev) => { ev.stopPropagation(); abrirEdicion(x) }}>Editar</button>
           <button className={`${s.iconbtn} ${s.iconbtnPeligro}`} onClick={(ev) => { ev.stopPropagation(); anularLinea(x) }}>Anular</button>
         </span>
@@ -226,12 +227,13 @@ export default function GestionSalidas() {
                 const disp = stock[l.articulo_id]?.stock ?? null
                 return (
                   <div className={s.linea} key={i}>
-                    <CampoSelect label="Artículo" nombre={`art-${i}`} valor={l.articulo_id}
+                    <SelectorArticulo
+                      label="Artículo" valor={l.articulo_id}
                       onChange={(_, v) => setLinea(i, 'articulo_id', v)}
-                      opciones={articulos.map((a) => ({
-                        valor: a.id,
-                        texto: `${a.descripcion} (disp. ${numero(stock[a.id]?.stock ?? 0)})`,
-                      }))} />
+                      articulos={articulos} stock={stock}
+                      categorias={config?.categorias} unidades={config?.unidades}
+                      sesion={sesion} recargar={recargar}
+                    />
                     <CampoSelect label="Municipio" nombre={`mun-${i}`} valor={l.municipio}
                       onChange={(_, v) => setLinea(i, 'municipio', v)}
                       opciones={MUNICIPIOS_CALDAS} placeholder="(usar por defecto)" />

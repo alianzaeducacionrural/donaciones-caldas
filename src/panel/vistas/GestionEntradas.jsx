@@ -3,19 +3,22 @@ import { useOutletContext, useSearchParams } from 'react-router-dom'
 import Tabla from '../../components/Tabla'
 import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect, CampoArea } from '../../components/Campos'
+import SelectorArticulo from '../../components/SelectorArticulo'
 import { useGuardar } from '../../hooks/useGuardar'
-import { crearEntrada, editarEntrada, anularEntrada } from '../../utils/api'
-import { esSi, siguienteRecibo, mesesDisponibles } from '../../utils/agregados'
+import { crearEntrada, editarEntrada, anularEntrada, crearTercero } from '../../utils/api'
+import { esSi, siguienteRecibo, mesesDisponibles, stockPorArticulo } from '../../utils/agregados'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
 import s from './vistas.module.css'
 
-const VACIA = { fecha: '', recibo: '', articulo_id: '', donante_id: '', cantidad: '', observaciones: '' }
+const OTRO = '__otro__'
+const VACIA = { fecha: '', recibo: '', articulo_id: '', donante_id: '', donante_nombre_nuevo: '', cantidad: '', observaciones: '' }
 
 export default function GestionEntradas() {
   const { datos, sesion, recargar } = useOutletContext()
-  const { articulos, entradas, terceros } = datos
+  const { articulos, entradas, salidas, terceros, config } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
+  const stockMap = useMemo(() => stockPorArticulo(entradas, salidas), [entradas, salidas])
 
   const [params, setParams] = useSearchParams()
   const filtro = params.get('filtro') || 'todas'
@@ -59,6 +62,7 @@ export default function GestionEntradas() {
       recibo: e.recibo || '',
       articulo_id: e.articulo_id || '',
       donante_id: e.donante_id || '',
+      donante_nombre_nuevo: '',
       cantidad: e.cantidad || '',
       observaciones: e.observaciones || '',
     })
@@ -66,19 +70,32 @@ export default function GestionEntradas() {
 
   const enviar = async (ev) => {
     ev.preventDefault()
-    const donante = terceros.find((t) => t.id === form.donante_id)
-    const payload = {
-      fecha: form.fecha,
-      recibo: form.recibo,
-      articulo_id: form.articulo_id,
-      donante_id: form.donante_id,
-      donante_nombre: donante?.nombre || '',
-      cantidad: Number(form.cantidad),
-      observaciones: form.observaciones,
-    }
     try {
-      if (form._nuevo) await ejecutar(() => crearEntrada(payload, sesion))
-      else await ejecutar(() => editarEntrada({ ...payload, id: form.id, actualizado: form.actualizado }, sesion))
+      await ejecutar(async () => {
+        let donanteId = form.donante_id
+        let donanteNombre = terceros.find((t) => t.id === form.donante_id)?.nombre || ''
+
+        if (donanteId === OTRO) {
+          const nombre = form.donante_nombre_nuevo.trim()
+          if (!nombre) throw new Error('Escribe el nombre del nuevo donante.')
+          const r = await crearTercero({ tipo: 'DONANTE', nombre }, sesion)
+          donanteId = r.id
+          donanteNombre = nombre
+        }
+
+        const payload = {
+          fecha: form.fecha,
+          recibo: form.recibo,
+          articulo_id: form.articulo_id,
+          donante_id: donanteId,
+          donante_nombre: donanteNombre,
+          cantidad: Number(form.cantidad),
+          observaciones: form.observaciones,
+        }
+        return form._nuevo
+          ? crearEntrada(payload, sesion)
+          : editarEntrada({ ...payload, id: form.id, actualizado: form.actualizado }, sesion)
+      })
       setForm(null)
     } catch { /* el error se muestra en el modal */ }
   }
@@ -187,14 +204,24 @@ export default function GestionEntradas() {
               <CampoTexto label="N° de recibo / folio" nombre="recibo" valor={form.recibo} onChange={set}
                 pista={form._nuevo ? 'Consecutivo sugerido; puedes cambiarlo' : undefined} />
               <div className="full">
-                <CampoSelect label="Artículo" nombre="articulo_id" valor={form.articulo_id} onChange={set} requerido
-                  opciones={articulos.map((a) => ({ valor: a.id, texto: `${a.id} · ${a.descripcion}` }))} />
+                <SelectorArticulo
+                  valor={form.articulo_id} onChange={set} requerido
+                  articulos={articulos} stock={stockMap}
+                  categorias={config?.categorias} unidades={config?.unidades}
+                  sesion={sesion} recargar={recargar}
+                />
               </div>
               <div className="full">
                 <CampoSelect label="Donante" nombre="donante_id" valor={form.donante_id} onChange={set} requerido
-                  opciones={donantes.map((t) => ({ valor: t.id, texto: t.nombre }))}
-                  pista={donantes.length ? undefined : 'Registra primero el donante en la sección Donantes y beneficiarios'} />
+                  opciones={[...donantes.map((t) => ({ valor: t.id, texto: t.nombre })), { valor: OTRO, texto: 'Otro (nuevo donante)' }]}
+                  pista={donantes.length ? undefined : 'O elige "Otro" para registrarlo aquí mismo'} />
               </div>
+              {form.donante_id === OTRO && (
+                <div className="full">
+                  <CampoTexto label="Nombre del nuevo donante" nombre="donante_nombre_nuevo"
+                    valor={form.donante_nombre_nuevo} onChange={set} requerido autoFocus />
+                </div>
+              )}
               <CampoNumero label="Cantidad recibida" nombre="cantidad" valor={form.cantidad} onChange={set} requerido min={1} />
               <div className="full">
                 <CampoArea label="Observaciones" nombre="observaciones" valor={form.observaciones} onChange={set} filas={2} />

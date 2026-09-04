@@ -1,5 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { cargarDatos, cargarPublico } from '../utils/api'
+import { tituloPropio } from '../utils/formatear'
+
+// Nombres de artículos y de personas/entidades se muestran en formato
+// "Nombre Propio" en toda la app, sin importar cómo quedaron en el Sheet.
+function normalizar(d) {
+  return {
+    articulos: (d.articulos || []).map((a) => ({ ...a, descripcion: tituloPropio(a.descripcion) })),
+    entradas: (d.entradas || []).map((e) => ({ ...e, donante_nombre: tituloPropio(e.donante_nombre) })),
+    salidas: (d.salidas || []).map((x) => ({ ...x, beneficiario_nombre: tituloPropio(x.beneficiario_nombre) })),
+    terceros: (d.terceros || []).map((t) => ({ ...t, nombre: tituloPropio(t.nombre) })),
+    auditoria: d.auditoria || [],
+    config: d.config || {},
+    resumen: d.resumen || null,
+    generado: d.generado || null,
+  }
+}
 
 // Carga única del snapshot. Sin clave → endpoint público (sin datos
 // personales). Con clave → snapshot completo del panel.
@@ -22,16 +38,7 @@ export function useDatos(sesion = null) {
     promesa
       .then((d) => {
         if (!vivo) return
-        setDatos({
-          articulos: d.articulos || [],
-          entradas: d.entradas || [],
-          salidas: d.salidas || [],
-          terceros: d.terceros || [],
-          auditoria: d.auditoria || [],
-          config: d.config || {},
-          resumen: d.resumen || null,
-          generado: d.generado || null,
-        })
+        setDatos(normalizar(d))
       })
       .catch((e) => { if (vivo) setError(e.message) })
       .finally(() => { if (vivo) setCargando(false) })

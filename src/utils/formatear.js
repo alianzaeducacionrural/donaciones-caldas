@@ -1,19 +1,7 @@
 // Formateo de valores para la interfaz. Todo en español de Colombia.
 
-const MESES = [
-  'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-  'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
-]
-
-// "2026-09-03" | Date | ISO  ->  "3 sep 2026"
+// "2026-09-03" | Date | ISO  ->  "03/09/2026" — formato único de fecha en toda la app.
 export function fechaCorta(valor) {
-  const d = aFecha(valor)
-  if (!d) return '—'
-  return `${d.getUTCDate()} ${MESES[d.getUTCMonth()]} ${d.getUTCFullYear()}`
-}
-
-// "2026-09-03"  ->  "03/09/2026"
-export function fechaNumerica(valor) {
   const d = aFecha(valor)
   if (!d) return '—'
   const p = (n) => String(n).padStart(2, '0')
@@ -51,6 +39,25 @@ export function capitalizar(s) {
   if (!s) return ''
   const t = String(s).toLowerCase()
   return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
+const CONECTORES = new Set([
+  'de', 'del', 'la', 'las', 'los', 'el', 'en', 'y', 'e', 'o', 'u',
+  'a', 'con', 'por', 'para', 'un', 'una', 'al', 'sin',
+])
+
+// "COBIJAS" | "marcela botero/miguel trujillo" -> "Cobijas" | "Marcela Botero/Miguel Trujillo"
+// Nombre propio en español: cada palabra con inicial mayúscula, salvo los
+// conectores (de, la, y…), que quedan en minúscula excepto al inicio.
+export function tituloPropio(valor) {
+  if (!valor) return ''
+  let esPrimera = true
+  return String(valor).toLowerCase().replace(/[a-záéíóúñü]+/gi, (palabra) => {
+    const forzar = esPrimera
+    esPrimera = false
+    if (!forzar && CONECTORES.has(palabra)) return palabra
+    return palabra.charAt(0).toUpperCase() + palabra.slice(1)
+  })
 }
 
 function aFecha(valor) {
