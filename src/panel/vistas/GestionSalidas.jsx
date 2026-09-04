@@ -5,6 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect } from '../../components/Campos'
 import SelectorArticulo from '../../components/SelectorArticulo'
 import { useGuardar } from '../../hooks/useGuardar'
+import { useConfirmar } from '../../hooks/useConfirmar'
 import { crearSalida, editarSalida, anularSalida, anularActa, crearTercero } from '../../utils/api'
 import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles, agruparPorFolio } from '../../utils/agregados'
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
@@ -20,6 +21,7 @@ export default function GestionSalidas() {
   const { datos, sesion, recargar } = useOutletContext()
   const { articulos, entradas, salidas, terceros, config } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
+  const confirmar = useConfirmar()
 
   const stock = useMemo(() => stockPorArticulo(entradas, salidas), [entradas, salidas])
   const artMap = Object.fromEntries(articulos.map((a) => [a.id, a]))
@@ -138,11 +140,13 @@ export default function GestionSalidas() {
   }
 
   const anularLinea = async (x) => {
-    if (!confirm(`¿Anular esta línea de la entrega ${x.acta}?`)) return
+    const ok = await confirmar(`¿Anular esta línea de la entrega ${x.acta}?`, { peligro: true, textoOk: 'Anular' })
+    if (!ok) return
     try { await ejecutar(() => anularSalida({ id: x.id }, sesion)) } catch { /* */ }
   }
   const anularActaCompleta = async (acta) => {
-    if (!confirm(`¿Anular TODA el acta ${acta} y devolver el stock?`)) return
+    const ok = await confirmar(`¿Anular TODA el acta ${acta} y devolver el stock?`, { peligro: true, textoOk: 'Anular acta' })
+    if (!ok) return
     try { await ejecutar(() => anularActa({ acta }, sesion)) } catch { /* */ }
   }
 
@@ -189,12 +193,9 @@ export default function GestionSalidas() {
     { clave: 'fecha', etiqueta: 'Fecha', ordenable: true, render: (x) => fechaCorta(x.fecha) },
     {
       clave: 'acta', etiqueta: 'Acta', ordenable: true,
-      render: (x) => (
-        <button className={s.iconbtn} title="Anular acta completa"
-          onClick={(ev) => { ev.stopPropagation(); anularActaCompleta(x.acta) }}>
-          {x.acta}
-        </button>
-      ),
+      render: (x) => x.acta
+        ? <span className="pildora pildora-neutra">{x.acta}</span>
+        : <span className={s.marcaPend}>s/n</span>,
     },
     { clave: 'articulo_id', etiqueta: 'Artículo', render: (x) => artMap[x.articulo_id]?.descripcion || x.articulo_id },
     { clave: 'municipio', etiqueta: 'Municipio', ordenable: true },

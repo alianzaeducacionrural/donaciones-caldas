@@ -5,6 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect, CampoArea } from '../../components/Campos'
 import SelectorArticulo from '../../components/SelectorArticulo'
 import { useGuardar } from '../../hooks/useGuardar'
+import { useConfirmar } from '../../hooks/useConfirmar'
 import { crearEntrada, editarEntrada, anularEntrada, crearTercero } from '../../utils/api'
 import { esSi, siguienteRecibo, mesesDisponibles, stockPorArticulo, agruparPorFolio } from '../../utils/agregados'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
@@ -18,6 +19,7 @@ export default function GestionEntradas() {
   const { datos, sesion, recargar } = useOutletContext()
   const { articulos, entradas, salidas, terceros, config } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
+  const confirmar = useConfirmar()
   const stockMap = useMemo(() => stockPorArticulo(entradas, salidas), [entradas, salidas])
 
   const [texto, setTexto] = useState('')
@@ -127,7 +129,11 @@ export default function GestionEntradas() {
   }
 
   const anular = async (e) => {
-    if (!confirm(`¿Anular la entrada de ${numero(e.cantidad)} × ${artMap[e.articulo_id]?.descripcion || e.articulo_id}?`)) return
+    const ok = await confirmar(
+      `¿Anular la entrada de ${numero(e.cantidad)} × ${artMap[e.articulo_id]?.descripcion || e.articulo_id}?`,
+      { peligro: true, textoOk: 'Anular' },
+    )
+    if (!ok) return
     try { await ejecutar(() => anularEntrada({ id: e.id }, sesion)) } catch { /* */ }
   }
 

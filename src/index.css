@@ -205,6 +205,13 @@ select.control {
 }
 .btn-peligro:hover { background: var(--agotado-fondo); text-decoration: none; }
 
+.btn-peligro-solido {
+  background: var(--agotado);
+  color: #fff;
+  box-shadow: var(--sombra);
+}
+.btn-peligro-solido:hover { background: #B91C1C; text-decoration: none; }
+
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 
 /* ── Píldoras de estado ── */

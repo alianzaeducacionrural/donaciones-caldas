@@ -5,6 +5,7 @@ import Modal from '../../components/Modal'
 import Semaforo from '../../components/Semaforo'
 import { CampoTexto, CampoSelect } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
+import { useConfirmar } from '../../hooks/useConfirmar'
 import { crearArticulo, editarArticulo, desactivarArticulo } from '../../utils/api'
 import { asegurarOpcion } from '../../utils/opcionesConfig'
 import { articulosConStock, esSi } from '../../utils/agregados'
@@ -17,6 +18,7 @@ export default function GestionArticulos() {
   const { datos, sesion, recargar } = useOutletContext()
   const { articulos, entradas, salidas, config } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
+  const confirmar = useConfirmar()
 
   const categorias = (config?.categorias || ['Hogar', 'Ropa', 'Alimentos'])
   const unidades = (config?.unidades || ['Unidad', 'Paca', 'Paquete', 'Rollo', 'Botellón'])
@@ -70,8 +72,10 @@ export default function GestionArticulos() {
   }
 
   const desactivar = async (a) => {
-    if (a.stock !== 0 && !confirm(`${a.descripcion} tiene ${numero(a.stock)} unidades en stock. ¿Desactivar de todos modos?`)) return
-    if (a.stock === 0 && !confirm(`¿Desactivar ${a.descripcion}?`)) return
+    const mensaje = a.stock !== 0
+      ? `${a.descripcion} tiene ${numero(a.stock)} unidades en stock. ¿Desactivar de todos modos?`
+      : `¿Desactivar ${a.descripcion}?`
+    if (!await confirmar(mensaje, { peligro: true, textoOk: 'Desactivar' })) return
     try { await ejecutar(() => desactivarArticulo({ id: a.id }, sesion)) } catch { /* */ }
   }
 

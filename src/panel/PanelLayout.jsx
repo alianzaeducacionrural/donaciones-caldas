@@ -4,6 +4,7 @@ import { useSesion } from '../hooks/useSesion'
 import { useDatos } from '../hooks/useDatos'
 import Acceso from './Acceso'
 import Cargando from '../components/Cargando'
+import Modal from '../components/Modal'
 import { inventarioCuadra, resumen } from '../utils/agregados'
 import { numero } from '../utils/formatear'
 import isologo from '../assets/isologo-blanco.png'
@@ -22,6 +23,7 @@ export default function PanelLayout() {
   const estado = useDatos(activa ? sesion : null)
   const [menu, setMenu] = useState(false)
   const [copiado, setCopiado] = useState(false)
+  const [enlaceManual, setEnlaceManual] = useState(null)
   const location = useLocation()
 
   const copiarEnlace = async () => {
@@ -29,7 +31,7 @@ export default function PanelLayout() {
     try {
       await navigator.clipboard.writeText(url)
     } catch {
-      window.prompt('Copia el enlace del dashboard:', url)
+      setEnlaceManual(url)
       return
     }
     setCopiado(true)
@@ -103,6 +105,22 @@ export default function PanelLayout() {
       </div>
 
       {menu && <div className={styles.velo} onClick={() => setMenu(false)} />}
+
+      <Modal titulo="Enlace del dashboard" abierto={!!enlaceManual} onCerrar={() => setEnlaceManual(null)} ancho={440}>
+        <p className="pista" style={{ marginBottom: '.6rem' }}>
+          No se pudo copiar automáticamente. Selecciona y copia el enlace:
+        </p>
+        <input
+          className="control"
+          readOnly
+          value={enlaceManual || ''}
+          onFocus={(e) => e.target.select()}
+          autoFocus
+        />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button type="button" className="btn btn-plano" onClick={() => setEnlaceManual(null)}>Cerrar</button>
+        </div>
+      </Modal>
     </div>
   )
 }

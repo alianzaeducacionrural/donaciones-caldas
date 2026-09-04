@@ -4,6 +4,7 @@ import Tabla from '../../components/Tabla'
 import Modal from '../../components/Modal'
 import { CampoTexto, CampoSelect, CampoArea } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
+import { useConfirmar } from '../../hooks/useConfirmar'
 import { crearTercero, editarTercero, desactivarTercero } from '../../utils/api'
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
 import s from './vistas.module.css'
@@ -14,6 +15,7 @@ export default function GestionTerceros() {
   const { datos, sesion, recargar } = useOutletContext()
   const { terceros } = datos
   const { ejecutar, guardando, error, limpiarError } = useGuardar(recargar)
+  const confirmar = useConfirmar()
 
   const [tipo, setTipo] = useState('')
   const [texto, setTexto] = useState('')
@@ -41,7 +43,8 @@ export default function GestionTerceros() {
   }
 
   const quitar = async (t) => {
-    if (!confirm(`¿Desactivar a ${t.nombre}?`)) return
+    const ok = await confirmar(`¿Desactivar a ${t.nombre}?`, { peligro: true, textoOk: 'Desactivar' })
+    if (!ok) return
     try { await ejecutar(() => desactivarTercero({ id: t.id }, sesion)) } catch { /* */ }
   }
 
