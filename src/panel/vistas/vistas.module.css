@@ -58,6 +58,31 @@
 .detalleMeta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.5rem; font-size: 0.85rem; margin-bottom: 0.75rem; }
 .detalleMeta b { color: var(--texto-suave); font-weight: 600; margin-right: 0.35rem; }
 
+.historialCaja {
+  border-radius: var(--radio-lg);
+  padding: 0.9rem 1.1rem 0.3rem;
+  margin-top: 1rem;
+  border: 1.5px solid;
+}
+.historialEntradas { background: var(--ok-fondo); border-color: #B7E0C0; }
+.historialSalidas { background: var(--agotado-fondo); border-color: #F3C6C6; }
+
+.historialTitulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+.historialEntradas .historialTitulo { color: var(--ok); }
+.historialSalidas .historialTitulo { color: var(--agotado); }
+.historialCuenta { font-weight: 600; opacity: 0.75; }
+
+.historialCaja .detalleTabla { background: var(--superficie); border-radius: var(--radio); overflow: hidden; margin-top: 0; }
+.historialCaja .detalleTabla th, .historialCaja .detalleTabla td { padding: 0.45rem 0.6rem; }
+.historialCaja .detalleTabla tr:last-child td { border-bottom: none; }
+
 @media (max-width: 760px) {
   .filtros { flex-wrap: wrap; }
   .filtros .control { flex: 1 1 auto; min-width: 160px; }

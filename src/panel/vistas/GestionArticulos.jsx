@@ -162,35 +162,43 @@ export default function GestionArticulos() {
               <div><b>Estado:</b> <Semaforo estado={detalle.estado} /></div>
             </div>
 
-            <p className="etiqueta" style={{ marginTop: '0.5rem' }}>Entradas ({historialEntradas.length})</p>
-            <table className={s.detalleTabla}>
-              <thead><tr><th>Fecha</th><th>Recibo</th><th>Donante</th><th style={{ textAlign: 'right' }}>Cantidad</th></tr></thead>
-              <tbody>
-                {historialEntradas.length ? historialEntradas.map((e) => (
-                  <tr key={e.id}>
-                    <td>{e.fecha ? fechaCorta(e.fecha) : 'sin fecha'}</td>
-                    <td>{e.recibo || 's/n'}</td>
-                    <td>{e.donante_nombre}</td>
-                    <td style={{ textAlign: 'right' }}>{numero(e.cantidad)}</td>
-                  </tr>
-                )) : <tr><td colSpan={4} style={{ color: 'var(--texto-suave)' }}>Sin entradas registradas</td></tr>}
-              </tbody>
-            </table>
+            <div className={`${s.historialCaja} ${s.historialEntradas}`}>
+              <p className={s.historialTitulo}>
+                <span aria-hidden="true">↓</span> Entradas <span className={s.historialCuenta}>({historialEntradas.length})</span>
+              </p>
+              <table className={s.detalleTabla}>
+                <thead><tr><th>Fecha</th><th>Recibo</th><th>Donante</th><th style={{ textAlign: 'right' }}>Cantidad</th></tr></thead>
+                <tbody>
+                  {historialEntradas.length ? historialEntradas.map((e) => (
+                    <tr key={e.id}>
+                      <td>{e.fecha ? fechaCorta(e.fecha) : 'sin fecha'}</td>
+                      <td>{e.recibo || 's/n'}</td>
+                      <td>{e.donante_nombre}</td>
+                      <td style={{ textAlign: 'right' }}>{numero(e.cantidad)}</td>
+                    </tr>
+                  )) : <tr><td colSpan={4} style={{ color: 'var(--texto-suave)' }}>Sin entradas registradas</td></tr>}
+                </tbody>
+              </table>
+            </div>
 
-            <p className="etiqueta" style={{ marginTop: '1rem' }}>Salidas ({historialSalidas.length})</p>
-            <table className={s.detalleTabla}>
-              <thead><tr><th>Fecha</th><th>Acta</th><th>Municipio</th><th style={{ textAlign: 'right' }}>Cantidad</th></tr></thead>
-              <tbody>
-                {historialSalidas.length ? historialSalidas.map((x) => (
-                  <tr key={x.id}>
-                    <td>{fechaCorta(x.fecha)}</td>
-                    <td>{x.acta || 's/n'}</td>
-                    <td>{x.municipio}</td>
-                    <td style={{ textAlign: 'right' }}>{numero(x.cantidad)}</td>
-                  </tr>
-                )) : <tr><td colSpan={4} style={{ color: 'var(--texto-suave)' }}>Sin salidas registradas</td></tr>}
-              </tbody>
-            </table>
+            <div className={`${s.historialCaja} ${s.historialSalidas}`}>
+              <p className={s.historialTitulo}>
+                <span aria-hidden="true">↑</span> Salidas <span className={s.historialCuenta}>({historialSalidas.length})</span>
+              </p>
+              <table className={s.detalleTabla}>
+                <thead><tr><th>Fecha</th><th>Acta</th><th>Municipio</th><th style={{ textAlign: 'right' }}>Cantidad</th></tr></thead>
+                <tbody>
+                  {historialSalidas.length ? historialSalidas.map((x) => (
+                    <tr key={x.id}>
+                      <td>{fechaCorta(x.fecha)}</td>
+                      <td>{x.acta || 's/n'}</td>
+                      <td>{x.municipio}</td>
+                      <td style={{ textAlign: 'right' }}>{numero(x.cantidad)}</td>
+                    </tr>
+                  )) : <tr><td colSpan={4} style={{ color: 'var(--texto-suave)' }}>Sin salidas registradas</td></tr>}
+                </tbody>
+              </table>
+            </div>
 
             <div className={s.pieForm}>
               <button type="button" className="btn btn-plano" onClick={() => setDetalle(null)}>Cerrar</button>
