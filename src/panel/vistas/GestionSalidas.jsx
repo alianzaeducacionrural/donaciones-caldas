@@ -58,7 +58,7 @@ export default function GestionSalidas() {
     limpiarError()
     setNueva({
       fecha: fechaISO(new Date()),
-      acta: siguienteRecibo(salidas, 'ENT-'),
+      acta: siguienteRecibo(salidas, 'ENT-', 'acta'),
       municipioDefecto: '',
       beneficiario_id: '',
       beneficiario_nombre_nuevo: '',

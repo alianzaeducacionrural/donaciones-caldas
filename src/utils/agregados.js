@@ -201,13 +201,14 @@ export function topDisponibles(articulos = [], entradas = [], salidas = [], n = 
     .slice(0, n)
 }
 
-// Siguiente número de recibo consecutivo (REC-001, REC-002…) mirando los ya
-// usados. Ignora recibos que no siguen el patrón (p. ej. los históricos S/N).
-export function siguienteRecibo(entradas = [], prefijo = 'REC-') {
+// Siguiente número de folio consecutivo (REC-001, ENT-002…) mirando los ya
+// usados en `campo` (recibo en entradas, acta en salidas). Ignora folios que
+// no siguen el patrón (p. ej. los históricos S/N).
+export function siguienteRecibo(filas = [], prefijo = 'REC-', campo = 'recibo') {
   const re = new RegExp('^' + prefijo + '(\\d+)$')
   let max = 0
-  entradas.forEach((e) => {
-    const m = re.exec(String(e.recibo || '').trim())
+  filas.forEach((f) => {
+    const m = re.exec(String(f[campo] || '').trim())
     if (m) max = Math.max(max, parseInt(m[1], 10))
   })
   return prefijo + String(max + 1).padStart(3, '0')
