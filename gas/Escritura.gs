@@ -27,25 +27,35 @@ function exigir(cond, mensaje) {
 
 // ── Entradas ──────────────────────────────────────────────────
 
+// Un mismo recibo puede traer varios artículos (d.lineas), igual que una
+// salida puede repartir un acta en varias líneas.
 function crearEntrada(d, operador) {
-  exigir(d.articulo_id, 'Falta el artículo.')
-  exigir(Number(d.cantidad) > 0, 'La cantidad debe ser mayor que cero.')
+  const lineas = (d.lineas || []).filter((l) => l.articulo_id && Number(l.cantidad) > 0)
+  exigir(lineas.length, 'La entrada no tiene artículos.')
 
   const fecha = fechaCorta(d.fecha)
   const recibo = String(d.recibo || '').trim()
   const pendiente = (!fecha || !recibo) ? 'SI' : ''
-  const id = siguienteId(HOJAS.ENTRADAS, 'ENTR-')
   const ahora = ahoraISO()
 
-  anexarFila(HOJAS.ENTRADAS, {
-    id: id, fecha: fecha, recibo: recibo,
-    articulo_id: d.articulo_id, donante_id: d.donante_id || '',
-    donante_nombre: d.donante_nombre || '', cantidad: Number(d.cantidad),
-    observaciones: d.observaciones || '', pendiente: pendiente,
-    operador: operador, creado: ahora, actualizado: ahora, anulado: '',
-  })
+  const h = hoja(HOJAS.ENTRADAS)
+  const filas = lineas.map((l, i) => ({
+    id: siguienteId(HOJAS.ENTRADAS, 'ENTR-', i),
+    fecha: fecha, recibo: recibo, articulo_id: l.articulo_id,
+    donante_id: d.donante_id || '', donante_nombre: d.donante_nombre || '',
+    cantidad: Number(l.cantidad), observaciones: d.observaciones || '',
+    pendiente: pendiente, operador: operador,
+    creado: ahora, actualizado: ahora, anulado: '',
+  }))
 
-  return { ok: true, id: id, entidad: 'entrada', stock: stockDisponible(d.articulo_id), detalle: { cantidad: Number(d.cantidad), articulo: d.articulo_id } }
+  const matriz = filas.map((f) => ENCABEZADOS.entradas.map((c) => (f[c] !== undefined ? f[c] : '')))
+  h.getRange(h.getLastRow() + 1, 1, matriz.length, matriz[0].length).setValues(matriz)
+
+  return {
+    ok: true, id: recibo || filas[0].id, entidad: 'entrada',
+    ids: filas.map((f) => f.id),
+    detalle: { recibo: recibo, articulos: lineas.length },
+  }
 }
 
 function editarEntrada(d, operador) {
@@ -72,7 +82,6 @@ function editarEntrada(d, operador) {
 function crearSalida(d, operador) {
   const lineas = (d.lineas || []).filter((l) => l.articulo_id && Number(l.cantidad) > 0)
   exigir(lineas.length, 'La entrega no tiene artículos.')
-  exigir(d.responsable, 'Falta el responsable de la entrega.')
   const municipioDefecto = normalizarMunicipio(d.municipioDefecto)
   exigir(municipioDefecto, 'Falta el municipio de destino.')
 
@@ -157,9 +166,9 @@ function crearArticulo(d, operador) {
   const id = siguienteId(HOJAS.ARTICULOS, 'ART-')
   const ahora = ahoraISO()
   anexarFila(HOJAS.ARTICULOS, {
-    id: id, descripcion: String(d.descripcion).trim().toUpperCase(),
-    categoria: String(d.categoria).trim().toUpperCase(),
-    unidad: String(d.unidad || 'UNIDAD').trim().toUpperCase(),
+    id: id, descripcion: String(d.descripcion).trim(),
+    categoria: String(d.categoria).trim(),
+    unidad: String(d.unidad || 'UNIDAD').trim(),
     stock_minimo: Number(d.stock_minimo || 0), activo: 'SI',
     creado: ahora, actualizado: ahora,
   })
@@ -171,9 +180,9 @@ function editarArticulo(d, operador) {
   exigir(fila, 'Artículo no encontrado.')
   verificarVersion(fila, d.actualizado)
   actualizarFila(HOJAS.ARTICULOS, fila._fila, {
-    descripcion: String(d.descripcion).trim().toUpperCase(),
-    categoria: String(d.categoria).trim().toUpperCase(),
-    unidad: String(d.unidad || 'UNIDAD').trim().toUpperCase(),
+    descripcion: String(d.descripcion).trim(),
+    categoria: String(d.categoria).trim(),
+    unidad: String(d.unidad || 'UNIDAD').trim(),
     stock_minimo: Number(d.stock_minimo || 0),
     actualizado: ahoraISO(),
   })

@@ -28,6 +28,19 @@ export function mesesDisponibles(filas = [], campo = 'fecha') {
   })
 }
 
+// Agrupa filas por un folio compartido (recibo/acta). Las filas sin folio
+// quedan cada una en su propio grupo — de lo contrario todas las entradas
+// "sin recibo" se mezclarían como si fueran una sola.
+export function agruparPorFolio(filas = [], campo) {
+  const grupos = new Map()
+  filas.forEach((f) => {
+    const clave = String(f[campo] || '').trim() || `__solo__${f.id}`
+    if (!grupos.has(clave)) grupos.set(clave, [])
+    grupos.get(clave).push(f)
+  })
+  return [...grupos.values()]
+}
+
 // Mapa { articulo_id: { entradas, salidas, stock } }
 export function stockPorArticulo(entradas = [], salidas = []) {
   const m = {}
@@ -49,14 +62,14 @@ export function articulosConStock(articulos = [], entradas = [], salidas = []) {
     .filter((a) => !esSi(a.inactivo) && String(a.activo || 'SI').toUpperCase() !== 'NO')
     .map((a) => {
       const s = stock[a.id] || { entradas: 0, salidas: 0, stock: 0 }
-      return { ...a, ...s, estado: estadoStock(s.stock, a.stock_minimo) }
+      return { ...a, ...s, estado: estadoStock(s.stock) }
     })
 }
 
-export function estadoStock(stock, minimo) {
-  const min = Number(minimo) || 0
+// Sin umbral configurable: "bajo" es simplemente poco stock (≤ 3 unidades).
+export function estadoStock(stock) {
   if (stock <= 0) return 'agotado'
-  if (stock <= min || stock <= 3) return 'bajo'
+  if (stock <= 3) return 'bajo'
   return 'ok'
 }
 

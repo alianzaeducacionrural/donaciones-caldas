@@ -5,15 +5,16 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect } from '../../components/Campos'
 import SelectorArticulo from '../../components/SelectorArticulo'
 import { useGuardar } from '../../hooks/useGuardar'
-import { crearSalida, editarSalida, anularSalida, anularActa } from '../../utils/api'
-import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles } from '../../utils/agregados'
+import { crearSalida, editarSalida, anularSalida, anularActa, crearTercero } from '../../utils/api'
+import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles, agruparPorFolio } from '../../utils/agregados'
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
 import { imprimirActa } from '../../utils/imprimirActa'
 import s from './vistas.module.css'
 
-const LINEA_VACIA = () => ({ articulo_id: '', cantidad: '', municipio: '' })
+const OTRO = '__otro__'
+const LINEA_VACIA = () => ({ articulo_id: '', cantidad: '' })
 
 export default function GestionSalidas() {
   const { datos, sesion, recargar } = useOutletContext()
@@ -28,8 +29,10 @@ export default function GestionSalidas() {
   const [fArticulo, setFArticulo] = useState('')
   const [fMunicipio, setFMunicipio] = useState('')
   const [fMes, setFMes] = useState('')
+  const [vista, setVista] = useState('articulo') // 'articulo' | 'acta'
   const [nueva, setNueva] = useState(null) // form de acta nueva
   const [edicion, setEdicion] = useState(null) // form de línea individual
+  const [detalleActa, setDetalleActa] = useState(null) // acta a mostrar en el modal "Ver"
 
   const meses = useMemo(() => mesesDisponibles(salidas), [salidas])
   const municipiosPresentes = useMemo(
@@ -58,6 +61,7 @@ export default function GestionSalidas() {
       acta: siguienteRecibo(salidas, 'ENT-'),
       municipioDefecto: '',
       beneficiario_id: '',
+      beneficiario_nombre_nuevo: '',
       responsable: '',
       lineas: [LINEA_VACIA()],
     })
@@ -76,23 +80,38 @@ export default function GestionSalidas() {
 
   const enviarNueva = async (ev) => {
     ev.preventDefault()
-    const b = terceros.find((t) => t.id === nueva.beneficiario_id)
-    const payload = {
-      fecha: nueva.fecha,
-      acta: nueva.acta || undefined,
-      municipioDefecto: nueva.municipioDefecto,
-      beneficiario_id: nueva.beneficiario_id,
-      beneficiario_nombre: b?.nombre || '',
-      responsable: nueva.responsable,
-      lineas: nueva.lineas
-        .filter((l) => l.articulo_id && l.cantidad)
-        .map((l) => ({
-          articulo_id: l.articulo_id,
-          cantidad: Number(l.cantidad),
-          municipio: l.municipio || nueva.municipioDefecto,
-        })),
-    }
-    try { await ejecutar(() => crearSalida(payload, sesion)); setNueva(null) } catch { /* */ }
+    try {
+      await ejecutar(async () => {
+        let beneficiarioId = nueva.beneficiario_id
+        let beneficiarioNombre = terceros.find((t) => t.id === nueva.beneficiario_id)?.nombre || ''
+
+        if (beneficiarioId === OTRO) {
+          const nombre = nueva.beneficiario_nombre_nuevo.trim()
+          if (!nombre) throw new Error('Escribe el nombre del nuevo beneficiario.')
+          const r = await crearTercero({ tipo: 'BENEFICIARIO', nombre }, sesion)
+          beneficiarioId = r.id
+          beneficiarioNombre = nombre
+        }
+
+        const payload = {
+          fecha: nueva.fecha,
+          acta: nueva.acta || undefined,
+          municipioDefecto: nueva.municipioDefecto,
+          beneficiario_id: beneficiarioId,
+          beneficiario_nombre: beneficiarioNombre,
+          responsable: nueva.responsable,
+          lineas: nueva.lineas
+            .filter((l) => l.articulo_id && l.cantidad)
+            .map((l) => ({
+              articulo_id: l.articulo_id,
+              cantidad: Number(l.cantidad),
+              municipio: nueva.municipioDefecto,
+            })),
+        }
+        return crearSalida(payload, sesion)
+      })
+      setNueva(null)
+    } catch { /* el error se muestra en el modal */ }
   }
 
   /* ── Editar línea ── */
@@ -131,6 +150,40 @@ export default function GestionSalidas() {
     const lineas = salidas.filter((x) => x.acta === acta && !esSi(x.anulado))
     imprimirActa(lineas, artMap)
   }
+
+  const gruposActa = useMemo(() => agruparPorFolio(filas, 'acta').map((lineas) => ({
+    _id: lineas[0].acta || lineas[0].id,
+    acta: lineas[0].acta,
+    fecha: lineas.find((l) => l.fecha)?.fecha || '',
+    municipios: [...new Set(lineas.map((l) => l.municipio).filter(Boolean))].join(', '),
+    articulos: lineas.length,
+    total: lineas.reduce((n, l) => n + (Number(l.cantidad) || 0), 0),
+    responsable: lineas.find((l) => l.responsable)?.responsable || '',
+    lineas,
+  })), [filas])
+
+  const columnasActa = [
+    { clave: 'fecha', etiqueta: 'Fecha', ordenable: true, render: (g) => fechaCorta(g.fecha) },
+    { clave: 'acta', etiqueta: 'Acta', ordenable: true, render: (g) => g.acta || <span className={s.marcaPend}>s/n</span> },
+    { clave: 'municipios', etiqueta: 'Municipio(s)' },
+    { clave: 'articulos', etiqueta: 'Artículos', alinear: 'right', ordenable: true },
+    { clave: 'total', etiqueta: 'Unidades', alinear: 'right', ordenable: true, render: (g) => <strong>{numero(g.total)}</strong> },
+    { clave: 'responsable', etiqueta: 'Responsable', render: (g) => g.responsable || '—' },
+    {
+      clave: '_acc', etiqueta: '', alinear: 'right',
+      render: (g) => (
+        <span className={s.acciones2}>
+          <button className={s.iconbtn} onClick={(ev) => { ev.stopPropagation(); setDetalleActa(g) }}>Ver</button>
+          <button className={s.iconbtn} title="Descargar el acta completa en PDF"
+            onClick={(ev) => { ev.stopPropagation(); imprimirActa(g.lineas, artMap) }}>⭳ PDF</button>
+          {g.acta && (
+            <button className={`${s.iconbtn} ${s.iconbtnPeligro}`}
+              onClick={(ev) => { ev.stopPropagation(); anularActaCompleta(g.acta) }}>Anular</button>
+          )}
+        </span>
+      ),
+    },
+  ]
 
   const columnas = [
     { clave: 'fecha', etiqueta: 'Fecha', ordenable: true, render: (x) => fechaCorta(x.fecha) },
@@ -202,8 +255,23 @@ export default function GestionSalidas() {
           </select>
           <input className="control" placeholder="Buscar acta, municipio o artículo…" value={texto} onChange={(e) => setTexto(e.target.value)} />
         </div>
-        <Tabla columnas={columnas} filas={filas} ordenInicial={{ clave: 'fecha', dir: 'desc' }} porPagina={25}
-          vacioTitulo="Sin entregas registradas" />
+
+        <div className={s.vistaToggle} role="tablist">
+          <button type="button" role="tab" aria-selected={vista === 'articulo'}
+            className={`${s.vistaBtn} ${vista === 'articulo' ? s.vistaActivo : ''}`}
+            onClick={() => setVista('articulo')}>Por artículo</button>
+          <button type="button" role="tab" aria-selected={vista === 'acta'}
+            className={`${s.vistaBtn} ${vista === 'acta' ? s.vistaActivo : ''}`}
+            onClick={() => setVista('acta')}>Por acta</button>
+        </div>
+
+        {vista === 'articulo' ? (
+          <Tabla columnas={columnas} filas={filas} ordenInicial={{ clave: 'fecha', dir: 'desc' }} porPagina={25}
+            vacioTitulo="Sin entregas registradas" />
+        ) : (
+          <Tabla columnas={columnasActa} filas={gruposActa} claveFila="_id" ordenInicial={{ clave: 'fecha', dir: 'desc' }} porPagina={25}
+            onFila={(g) => setDetalleActa(g)} vacioTitulo="Sin actas registradas" />
+        )}
       </div>
 
       {/* ── Modal acta nueva ── */}
@@ -214,11 +282,17 @@ export default function GestionSalidas() {
               <CampoFecha label="Fecha" nombre="fecha" valor={nueva.fecha} onChange={setN} requerido />
               <CampoTexto label="N° de acta" nombre="acta" valor={nueva.acta} onChange={setN}
                 pista="Consecutivo sugerido; puedes cambiarlo" />
-              <CampoSelect label="Municipio por defecto" nombre="municipioDefecto" valor={nueva.municipioDefecto}
+              <CampoSelect label="Municipio" nombre="municipioDefecto" valor={nueva.municipioDefecto}
                 onChange={setN} requerido opciones={MUNICIPIOS_CALDAS} />
               <CampoSelect label="Beneficiario" nombre="beneficiario_id" valor={nueva.beneficiario_id} onChange={setN}
-                opciones={beneficiarios.map((t) => ({ valor: t.id, texto: t.nombre }))} />
-              <CampoTexto label="Responsable de la entrega" nombre="responsable" valor={nueva.responsable} onChange={setN} requerido />
+                opciones={[...beneficiarios.map((t) => ({ valor: t.id, texto: t.nombre })), { valor: OTRO, texto: 'Otro (nuevo beneficiario)' }]} />
+              {nueva.beneficiario_id === OTRO && (
+                <div className="full">
+                  <CampoTexto label="Nombre del nuevo beneficiario" nombre="beneficiario_nombre_nuevo"
+                    valor={nueva.beneficiario_nombre_nuevo} onChange={setN} requerido autoFocus />
+                </div>
+              )}
+              <CampoTexto label="Responsable de la entrega" nombre="responsable" valor={nueva.responsable} onChange={setN} />
             </div>
 
             <p className="etiqueta" style={{ marginTop: '0.5rem' }}>Artículos entregados</p>
@@ -234,9 +308,6 @@ export default function GestionSalidas() {
                       categorias={config?.categorias} unidades={config?.unidades}
                       sesion={sesion} recargar={recargar}
                     />
-                    <CampoSelect label="Municipio" nombre={`mun-${i}`} valor={l.municipio}
-                      onChange={(_, v) => setLinea(i, 'municipio', v)}
-                      opciones={MUNICIPIOS_CALDAS} placeholder="(usar por defecto)" />
                     <CampoNumero label="Cantidad" nombre={`cant-${i}`} valor={l.cantidad}
                       onChange={(_, v) => setLinea(i, 'cantidad', v)} min={1}
                       pista={disp != null ? `disp. ${numero(disp)}` : undefined} />
@@ -259,6 +330,41 @@ export default function GestionSalidas() {
               </button>
             </div>
           </form>
+        )}
+      </Modal>
+
+      {/* ── Modal: ver acta completa ── */}
+      <Modal titulo={`Acta ${detalleActa?.acta || '(sin número)'}`} abierto={!!detalleActa} onCerrar={() => setDetalleActa(null)} ancho={620}>
+        {detalleActa && (
+          <>
+            <div className={s.detalleMeta}>
+              <div><b>Fecha:</b>{fechaCorta(detalleActa.fecha)}</div>
+              <div><b>Municipio(s):</b>{detalleActa.municipios || '—'}</div>
+              <div><b>Responsable:</b>{detalleActa.responsable || '—'}</div>
+              <div><b>Artículos:</b>{detalleActa.articulos}</div>
+            </div>
+            <table className={s.detalleTabla}>
+              <thead>
+                <tr><th>Artículo</th><th>Municipio</th><th style={{ textAlign: 'right' }}>Cantidad</th></tr>
+              </thead>
+              <tbody>
+                {detalleActa.lineas.map((l) => (
+                  <tr key={l.id}>
+                    <td>{artMap[l.articulo_id]?.descripcion || l.articulo_id}</td>
+                    <td>{l.municipio}</td>
+                    <td style={{ textAlign: 'right' }}>{numero(l.cantidad)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr><td colSpan={2}>Total</td><td style={{ textAlign: 'right' }}>{numero(detalleActa.total)}</td></tr>
+              </tfoot>
+            </table>
+            <div className={s.pieForm}>
+              <button type="button" className="btn btn-plano" onClick={() => setDetalleActa(null)}>Cerrar</button>
+              <button type="button" className="btn btn-primario" onClick={() => imprimirActa(detalleActa.lineas, artMap)}>⭳ Descargar PDF</button>
+            </div>
+          </>
         )}
       </Modal>
 

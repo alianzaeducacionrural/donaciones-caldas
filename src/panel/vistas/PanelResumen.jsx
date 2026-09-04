@@ -33,7 +33,7 @@ export default function PanelResumen() {
       {r.pendientes > 0 && (
         <div className="avisoError">
           Hay {r.pendientes} entradas sin fecha o sin número de recibo.{' '}
-          <Link to="/panel/entradas?filtro=pendientes"><strong>Completarlas →</strong></Link>
+          <Link to="/panel/entradas"><strong>Completarlas →</strong></Link>
         </div>
       )}
 
