@@ -15,7 +15,6 @@ const ENLACES = [
   { a: '/panel/salidas', txt: 'Salidas', glifo: '↑' },
   { a: '/panel/articulos', txt: 'Artículos', glifo: '▦' },
   { a: '/panel/terceros', txt: 'Donantes y beneficiarios', glifo: '◈' },
-  { a: '/panel/auditoria', txt: 'Auditoría', glifo: '≡' },
 ]
 
 export default function PanelLayout() {

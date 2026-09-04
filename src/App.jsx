@@ -10,7 +10,6 @@ import GestionEntradas from './panel/vistas/GestionEntradas'
 import GestionSalidas from './panel/vistas/GestionSalidas'
 import GestionArticulos from './panel/vistas/GestionArticulos'
 import GestionTerceros from './panel/vistas/GestionTerceros'
-import Auditoria from './panel/vistas/Auditoria'
 import Cargando from './components/Cargando'
 
 // El mapa carga su propio chunk (geometría ~30 KB).
@@ -40,7 +39,6 @@ export default function App() {
           <Route path="salidas" element={<GestionSalidas />} />
           <Route path="articulos" element={<GestionArticulos />} />
           <Route path="terceros" element={<GestionTerceros />} />
-          <Route path="auditoria" element={<Auditoria />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
