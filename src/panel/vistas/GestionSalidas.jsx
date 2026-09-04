@@ -9,6 +9,7 @@ import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles } from '../..
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
+import { imprimirActa } from '../../utils/imprimirActa'
 import s from './vistas.module.css'
 
 const LINEA_VACIA = () => ({ articulo_id: '', cantidad: '', municipio: '' })
@@ -125,6 +126,11 @@ export default function GestionSalidas() {
     try { await ejecutar(() => anularActa({ acta }, sesion)) } catch { /* */ }
   }
 
+  const verActa = (acta) => {
+    const lineas = salidas.filter((x) => x.acta === acta && !esSi(x.anulado))
+    imprimirActa(lineas, artMap)
+  }
+
   const columnas = [
     { clave: 'fecha', etiqueta: 'Fecha', ordenable: true, render: (x) => fechaCorta(x.fecha) },
     {
@@ -144,6 +150,8 @@ export default function GestionSalidas() {
       clave: '_acc', etiqueta: '', alinear: 'right',
       render: (x) => (
         <span className={s.acciones2}>
+          <button className={s.iconbtn} title="Ver / imprimir el acta completa"
+            onClick={(ev) => { ev.stopPropagation(); verActa(x.acta) }}>🖶 Acta</button>
           <button className={s.iconbtn} onClick={(ev) => { ev.stopPropagation(); abrirEdicion(x) }}>Editar</button>
           <button className={`${s.iconbtn} ${s.iconbtnPeligro}`} onClick={(ev) => { ev.stopPropagation(); anularLinea(x) }}>Anular</button>
         </span>
