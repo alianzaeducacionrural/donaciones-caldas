@@ -5,7 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect, CampoArea } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
 import { crearEntrada, editarEntrada, anularEntrada } from '../../utils/api'
-import { esSi, siguienteRecibo } from '../../utils/agregados'
+import { esSi, siguienteRecibo, mesesDisponibles } from '../../utils/agregados'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
 import s from './vistas.module.css'
@@ -20,21 +20,28 @@ export default function GestionEntradas() {
   const [params, setParams] = useSearchParams()
   const filtro = params.get('filtro') || 'todas'
   const [texto, setTexto] = useState('')
+  const [fDonante, setFDonante] = useState('')
+  const [fArticulo, setFArticulo] = useState('')
+  const [fMes, setFMes] = useState('')
   const [form, setForm] = useState(null) // null | {…} (nuevo o edición)
 
   const donantes = terceros.filter((t) => /DONANTE|AMBOS/i.test(t.tipo || ''))
   const artMap = Object.fromEntries(articulos.map((a) => [a.id, a]))
+  const meses = useMemo(() => mesesDisponibles(entradas), [entradas])
 
   const filas = useMemo(() => {
     let f = entradas.filter((e) => !esSi(e.anulado))
     if (filtro === 'pendientes') f = f.filter((e) => esSi(e.pendiente))
+    if (fDonante) f = f.filter((e) => e.donante_id === fDonante)
+    if (fArticulo) f = f.filter((e) => e.articulo_id === fArticulo)
+    if (fMes) f = f.filter((e) => String(e.fecha || '').startsWith(fMes))
     if (texto) {
       const q = texto.toLowerCase()
       f = f.filter((e) =>
         `${e.donante_nombre} ${artMap[e.articulo_id]?.descripcion || ''} ${e.recibo}`.toLowerCase().includes(q))
     }
     return f
-  }, [entradas, filtro, texto, artMap])
+  }, [entradas, filtro, fDonante, fArticulo, fMes, texto, artMap])
 
   const set = (campo, valor) => setForm((prev) => ({ ...prev, [campo]: valor }))
 
@@ -141,6 +148,18 @@ export default function GestionEntradas() {
           >
             <option value="todas">Todas</option>
             <option value="pendientes">Solo por completar</option>
+          </select>
+          <select className="control" value={fDonante} onChange={(e) => setFDonante(e.target.value)}>
+            <option value="">Todos los donantes</option>
+            {donantes.map((t) => <option key={t.id} value={t.id}>{t.nombre}</option>)}
+          </select>
+          <select className="control" value={fArticulo} onChange={(e) => setFArticulo(e.target.value)}>
+            <option value="">Todos los artículos</option>
+            {articulos.map((a) => <option key={a.id} value={a.id}>{a.descripcion}</option>)}
+          </select>
+          <select className="control" value={fMes} onChange={(e) => setFMes(e.target.value)}>
+            <option value="">Todos los meses</option>
+            {meses.map((m) => <option key={m.valor} value={m.valor}>{m.texto}</option>)}
           </select>
           <input className="control" placeholder="Buscar donante, artículo o recibo…" value={texto} onChange={(e) => setTexto(e.target.value)} />
         </div>

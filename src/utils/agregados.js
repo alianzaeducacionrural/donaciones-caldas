@@ -10,6 +10,24 @@ export function esSi(v) {
     String(v || '').trim().toUpperCase() === 'SÍ'
 }
 
+const MESES_ES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+]
+
+// Meses (YYYY-MM) presentes en un campo de fecha, listos para un <select>.
+export function mesesDisponibles(filas = [], campo = 'fecha') {
+  const set = new Set()
+  filas.forEach((f) => {
+    const m = /^(\d{4})-(\d{2})/.exec(String(f[campo] || ''))
+    if (m) set.add(`${m[1]}-${m[2]}`)
+  })
+  return [...set].sort().reverse().map((ym) => {
+    const [anio, mes] = ym.split('-')
+    return { valor: ym, texto: `${MESES_ES[Number(mes) - 1]} ${anio}` }
+  })
+}
+
 // Mapa { articulo_id: { entradas, salidas, stock } }
 export function stockPorArticulo(entradas = [], salidas = []) {
   const m = {}

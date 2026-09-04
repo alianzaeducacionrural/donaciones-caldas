@@ -5,7 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
 import { crearSalida, editarSalida, anularSalida, anularActa } from '../../utils/api'
-import { esSi, stockPorArticulo, siguienteRecibo } from '../../utils/agregados'
+import { esSi, stockPorArticulo, siguienteRecibo, mesesDisponibles } from '../../utils/agregados'
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
@@ -23,17 +23,30 @@ export default function GestionSalidas() {
   const beneficiarios = terceros.filter((t) => /BENEFICIARIO|AMBOS/i.test(t.tipo || ''))
 
   const [texto, setTexto] = useState('')
+  const [fArticulo, setFArticulo] = useState('')
+  const [fMunicipio, setFMunicipio] = useState('')
+  const [fMes, setFMes] = useState('')
   const [nueva, setNueva] = useState(null) // form de acta nueva
   const [edicion, setEdicion] = useState(null) // form de línea individual
 
+  const meses = useMemo(() => mesesDisponibles(salidas), [salidas])
+  const municipiosPresentes = useMemo(
+    () => [...new Set(salidas.filter((x) => !esSi(x.anulado)).map((x) => x.municipio).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'es')),
+    [salidas],
+  )
+
   const filas = useMemo(() => {
     let f = salidas.filter((x) => !esSi(x.anulado))
+    if (fArticulo) f = f.filter((x) => x.articulo_id === fArticulo)
+    if (fMunicipio) f = f.filter((x) => x.municipio === fMunicipio)
+    if (fMes) f = f.filter((x) => String(x.fecha || '').startsWith(fMes))
     if (texto) {
       const q = texto.toLowerCase()
       f = f.filter((x) => `${x.acta} ${x.municipio} ${artMap[x.articulo_id]?.descripcion || ''}`.toLowerCase().includes(q))
     }
     return f
-  }, [salidas, texto, artMap])
+  }, [salidas, fArticulo, fMunicipio, fMes, texto, artMap])
 
   /* ── Acta nueva ── */
   const abrirNueva = () => {
@@ -166,6 +179,18 @@ export default function GestionSalidas() {
 
       <div className={s.tarjeta}>
         <div className={s.filtros}>
+          <select className="control" value={fArticulo} onChange={(e) => setFArticulo(e.target.value)}>
+            <option value="">Todos los artículos</option>
+            {articulos.map((a) => <option key={a.id} value={a.id}>{a.descripcion}</option>)}
+          </select>
+          <select className="control" value={fMunicipio} onChange={(e) => setFMunicipio(e.target.value)}>
+            <option value="">Todos los municipios</option>
+            {municipiosPresentes.map((m) => <option key={m} value={m}>{m}</option>)}
+          </select>
+          <select className="control" value={fMes} onChange={(e) => setFMes(e.target.value)}>
+            <option value="">Todos los meses</option>
+            {meses.map((m) => <option key={m.valor} value={m.valor}>{m.texto}</option>)}
+          </select>
           <input className="control" placeholder="Buscar acta, municipio o artículo…" value={texto} onChange={(e) => setTexto(e.target.value)} />
         </div>
         <Tabla columnas={columnas} filas={filas} ordenInicial={{ clave: 'fecha', dir: 'desc' }} porPagina={25}
