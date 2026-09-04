@@ -170,6 +170,18 @@ export function topDisponibles(articulos = [], entradas = [], salidas = [], n = 
     .slice(0, n)
 }
 
+// Siguiente número de recibo consecutivo (REC-001, REC-002…) mirando los ya
+// usados. Ignora recibos que no siguen el patrón (p. ej. los históricos S/N).
+export function siguienteRecibo(entradas = [], prefijo = 'REC-') {
+  const re = new RegExp('^' + prefijo + '(\\d+)$')
+  let max = 0
+  entradas.forEach((e) => {
+    const m = re.exec(String(e.recibo || '').trim())
+    if (m) max = Math.max(max, parseInt(m[1], 10))
+  })
+  return prefijo + String(max + 1).padStart(3, '0')
+}
+
 // Comprobación de cuadre: Σ entradas − Σ salidas === Σ stock
 export function inventarioCuadra(articulos = [], entradas = [], salidas = []) {
   const conStock = articulosConStock(articulos, entradas, salidas)

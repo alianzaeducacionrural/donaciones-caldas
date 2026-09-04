@@ -5,7 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect, CampoArea } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
 import { crearEntrada, editarEntrada, anularEntrada } from '../../utils/api'
-import { esSi } from '../../utils/agregados'
+import { esSi, siguienteRecibo } from '../../utils/agregados'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
 import s from './vistas.module.css'
@@ -38,7 +38,10 @@ export default function GestionEntradas() {
 
   const set = (campo, valor) => setForm((prev) => ({ ...prev, [campo]: valor }))
 
-  const abrirNuevo = () => { limpiarError(); setForm({ ...VACIA, _nuevo: true }) }
+  const abrirNuevo = () => {
+    limpiarError()
+    setForm({ ...VACIA, recibo: siguienteRecibo(entradas), _nuevo: true })
+  }
   const abrirEdicion = (e) => {
     limpiarError()
     setForm({
@@ -162,7 +165,8 @@ export default function GestionEntradas() {
             <div className={s.formGrid}>
               <CampoFecha label="Fecha" nombre="fecha" valor={form.fecha} onChange={set}
                 pista="Déjala vacía si aún no se conoce" />
-              <CampoTexto label="N° de recibo / folio" nombre="recibo" valor={form.recibo} onChange={set} />
+              <CampoTexto label="N° de recibo / folio" nombre="recibo" valor={form.recibo} onChange={set}
+                pista={form._nuevo ? 'Consecutivo sugerido; puedes cambiarlo' : undefined} />
               <div className="full">
                 <CampoSelect label="Artículo" nombre="articulo_id" valor={form.articulo_id} onChange={set} requerido
                   opciones={articulos.map((a) => ({ valor: a.id, texto: `${a.id} · ${a.descripcion}` }))} />

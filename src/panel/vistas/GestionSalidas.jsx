@@ -5,7 +5,7 @@ import Modal from '../../components/Modal'
 import { CampoTexto, CampoNumero, CampoFecha, CampoSelect } from '../../components/Campos'
 import { useGuardar } from '../../hooks/useGuardar'
 import { crearSalida, editarSalida, anularSalida, anularActa } from '../../utils/api'
-import { esSi, stockPorArticulo } from '../../utils/agregados'
+import { esSi, stockPorArticulo, siguienteRecibo } from '../../utils/agregados'
 import { MUNICIPIOS_CALDAS } from '../../utils/municipios'
 import { fechaCorta, fechaISO, numero } from '../../utils/formatear'
 import { exportarCsv } from '../../utils/exportarCsv'
@@ -40,7 +40,7 @@ export default function GestionSalidas() {
     limpiarError()
     setNueva({
       fecha: fechaISO(new Date()),
-      acta: '',
+      acta: siguienteRecibo(salidas, 'ENT-'),
       municipioDefecto: '',
       beneficiario_id: '',
       responsable: '',
@@ -179,7 +179,7 @@ export default function GestionSalidas() {
             <div className={s.formGrid}>
               <CampoFecha label="Fecha" nombre="fecha" valor={nueva.fecha} onChange={setN} requerido />
               <CampoTexto label="N° de acta" nombre="acta" valor={nueva.acta} onChange={setN}
-                pista="Vacío = consecutivo automático" />
+                pista="Consecutivo sugerido; puedes cambiarlo" />
               <CampoSelect label="Municipio por defecto" nombre="municipioDefecto" valor={nueva.municipioDefecto}
                 onChange={setN} requerido opciones={MUNICIPIOS_CALDAS} />
               <CampoSelect label="Beneficiario" nombre="beneficiario_id" valor={nueva.beneficiario_id} onChange={setN}
