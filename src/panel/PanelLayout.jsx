@@ -21,7 +21,20 @@ export default function PanelLayout() {
   const { sesion, activa, ingresar, salir } = useSesion()
   const estado = useDatos(activa ? sesion : null)
   const [menu, setMenu] = useState(false)
+  const [copiado, setCopiado] = useState(false)
   const location = useLocation()
+
+  const copiarEnlace = async () => {
+    const url = `${window.location.origin}/donaciones-caldas/`
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      window.prompt('Copia el enlace del dashboard:', url)
+      return
+    }
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 1800)
+  }
 
   if (!activa) return <Acceso onIngresar={ingresar} />
 
@@ -74,6 +87,9 @@ export default function PanelLayout() {
               <span className={styles.chipAviso}>{r.pendientes} entradas por completar</span>
             )}
           </div>
+          <button className={`${styles.copiar} ${copiado ? styles.copiarOk : ''}`} onClick={copiarEnlace}>
+            {copiado ? '✓ Enlace copiado' : '⎘ Copiar enlace del dashboard'}
+          </button>
           <button className={styles.recargar} onClick={estado.recargar} disabled={estado.cargando}>
             ↻ Actualizar
           </button>
